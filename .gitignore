@@ -1,3 +1,16 @@
+
 # Local agent instructions and personal workspace files
 AGENTS.md
 .personal/
+
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+coverage/
+.DS_Store
+*.local
+.vscode/
+.idea/
+
