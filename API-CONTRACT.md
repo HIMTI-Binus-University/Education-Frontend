@@ -67,8 +67,10 @@ type Summary = SummaryMetadata & { content: TiptapDocument };
 | `name` | string | Nama publik, tidak kosong |
 | `code` | string | Kode publik, tidak kosong dan unik case-insensitive |
 | `semester` | integer > 0 | Semester kurikulum matkul, bukan semester berjalan pengguna |
-| `icon` | enum | `code`, `database`, `math`, `box`, `network`, `terminal` |
+| `icon` | enum, opsional | Override: `code`, `database`, `math`, `box`, `network`, `terminal`, `book` |
 | `description` | string | Deskripsi plain text; boleh kosong jika belum tersedia |
+
+`icon` tidak wajib dikirim. Frontend memilih ikon secara deterministik berdasarkan kata kunci pada `name`, lalu `code`, case-insensitive (Inggris/Indonesia). Contoh aturan: Database/Basis Data/DB → database; Calculus/Kalkulus/CALC → math; Programming/Pemrograman/ALGO → code. Jika tidak dikenali, gunakan ikon buku (`book`). Ini heuristik UI, bukan klasifikasi akademik resmi atau layanan AI. Override valid dari backend selalu menang, termasuk `book`; `null`, string kosong, dan enum tidak dikenal tetap tidak sah. Resolver yang sama digunakan Home, direktori, dan daftar resource. Backend tidak perlu mengirim gambar/SVG.
 
 ### Contributor
 

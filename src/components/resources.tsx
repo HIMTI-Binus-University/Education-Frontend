@@ -19,23 +19,26 @@ import {
 import {
   safeExternalUrl,
   youtubeEmbedUrl,
+  resolveCourseIcon,
+  type CourseIconName,
   type Course,
   type SummaryMetadata,
   type AcademicEvent,
 } from "../data/education";
 import { eventDay, eventMonth, eventTime } from "../utils/date";
 
-const courseIcons: Record<Course["icon"], LucideIcon> = {
+const courseIcons: Record<CourseIconName, LucideIcon> = {
   code: CodeXml,
   database: Database,
   math: Sigma,
   box: Box,
   network: Network,
   terminal: Terminal,
+  book: BookOpen,
 };
 
 export function CourseIcon({ course }: { course: Course }) {
-  return <IconTile icon={courseIcons[course.icon]} />;
+  return <IconTile icon={courseIcons[resolveCourseIcon(course)]} />;
 }
 
 export function IconTile({
@@ -98,7 +101,7 @@ export function CourseCard({
       to={`/courses/${course.id}`}
       className={`course-card panel${detailed ? " detailed" : ""}`}
     >
-      <IconTile icon={courseIcons[course.icon]} />
+      <CourseIcon course={course} />
       <div>
         <h3>{course.name}</h3>
         {detailed && (

@@ -1,5 +1,6 @@
 import type { JSONContent } from "@tiptap/react";
 import type { AcademicEvent, Course, Summary, SummaryMetadata } from "../../data/education";
+import { courseIconNames } from "../../data/education";
 
 export interface EducationData {
   courses: Course[];
@@ -19,8 +20,9 @@ const positiveInteger = (value: unknown): value is number => Number.isInteger(va
 const invalid = (): never => { throw new PublicApiError("Invalid public API response"); };
 
 function course(value: unknown): Course {
-  if (!object(value) || !identifier(value.id) || !text(value.name) || !value.name.trim() || !text(value.code) || !value.code.trim() || !positiveInteger(value.semester) || !["code", "database", "math", "box", "network", "terminal"].includes(String(value.icon)) || !text(value.description)) return invalid();
-  return { id: value.id, name: value.name, code: value.code, semester: value.semester, icon: value.icon as Course["icon"], description: value.description };
+  if (!object(value) || !identifier(value.id) || !text(value.name) || !value.name.trim() || !text(value.code) || !value.code.trim() || !positiveInteger(value.semester) || !text(value.description)) return invalid();
+  if (value.icon !== undefined && !courseIconNames.includes(value.icon as typeof courseIconNames[number])) return invalid();
+  return { id: value.id, name: value.name, code: value.code, semester: value.semester, ...(value.icon === undefined ? {} : { icon: value.icon as Course["icon"] }), description: value.description };
 }
 
 function metadata(value: unknown): SummaryMetadata {

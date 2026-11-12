@@ -8,6 +8,15 @@ const signal = () => new AbortController().signal;
 const json = (value: unknown, status = 200) => new Response(JSON.stringify(value), { status, headers: { "Content-Type": "application/json" } });
 
 describe("public education API", () => {
+  it("accepts courses without icons and validates optional overrides", () => {
+    const withoutIcon = { ...courses[0] };
+    delete withoutIcon.icon;
+    const parse = (item: unknown) => parseCatalog({ courses: [item], summaries: [], events: [] }).courses[0];
+    expect(parse(withoutIcon)).not.toHaveProperty("icon");
+    expect(parse({ ...withoutIcon, icon: "book" }).icon).toBe("book");
+    expect(parse({ ...withoutIcon, icon: "network" }).icon).toBe("network");
+    for (const icon of [null, "", "unrecognized", 0]) expect(() => parse({ ...withoutIcon, icon })).toThrow(PublicApiError);
+  });
   it("requests only public metadata and never falls back to fixtures", async () => {
     const fetch = vi.fn().mockResolvedValue(json({ courses: [], summaries: [], events: [] }));
     vi.stubGlobal("fetch", fetch);

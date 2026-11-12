@@ -1,12 +1,34 @@
 import type { JSONContent } from "@tiptap/react";
 
+export const courseIconNames = ["code", "database", "math", "box", "network", "terminal", "book"] as const;
+export type CourseIconName = typeof courseIconNames[number];
+
 export interface Course {
   id: string;
   name: string;
   code: string;
   semester: number;
-  icon: "code" | "database" | "math" | "box" | "network" | "terminal";
+  icon?: CourseIconName;
   description: string;
+}
+
+const courseIconRules: [CourseIconName, RegExp][] = [
+  ["database", /\b(databases?|basis data|pangkalan data|sql|db|dbms|rdbms)\b/],
+  ["terminal", /\b(operating systems?|sistem operasi|linux|unix|os|information security|keamanan informasi)\b/],
+  ["network", /\b(networks?|networking|jaringan|distributed systems?|sistem terdistribusi|net)\b/],
+  ["math", /\b(mathematics|math|matematika|calculus|kalkulus|algebra|aljabar|statistics|statistika|statistik|probability|probabilitas|diskrit|calc|stat|linalg|dmath)\b/],
+  ["box", /\b(architecture|arsitektur|computer graphics|grafika komputer|software engineering|rekayasa perangkat lunak|arch|cg|se)\b/],
+  ["code", /\b(programming|pemrograman|algorithms?|algoritma|data structures?|struktur data|web|coding|oop|algo|ds)\b/],
+];
+
+export function resolveCourseIcon(course: Pick<Course, "name" | "code" | "icon">): CourseIconName {
+  if (course.icon) return course.icon;
+  for (const value of [course.name, course.code]) {
+    const normalized = value.toLocaleLowerCase().replace(/[_-]+/g, " ").replace(/\s+/g, " ");
+    const match = courseIconRules.find(([, pattern]) => pattern.test(normalized));
+    if (match) return match[0];
+  }
+  return "book";
 }
 
 export interface Contributor {
