@@ -17,7 +17,7 @@ import javascript from "highlight.js/lib/languages/javascript";
 import python from "highlight.js/lib/languages/python";
 import "katex/dist/katex.min.css";
 import "highlight.js/styles/github.css";
-import { safeExternalUrl, type Summary } from "../data/demo";
+import { safeExternalUrl, type Summary } from "../data/education";
 
 const lowlight = createLowlight({ cpp, sql, javascript, python });
 const ReaderAnchors = Extension.create({

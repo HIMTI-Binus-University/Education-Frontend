@@ -1,24 +1,27 @@
 import { useQuery } from "@tanstack/react-query";
-import {
-  courses,
-  summaries,
-  events,
-  type Course,
-  type Summary,
-  type AcademicEvent,
-} from "../../data/demo";
+import { fetchCatalog, fetchSummary, PublicApiError } from "./client";
+export type { EducationData } from "./client";
 
-export interface EducationData {
-  courses: Course[];
-  summaries: Summary[];
-  events: AcademicEvent[];
+export const educationKey = ["education", "catalog"] as const;
+export const summaryKey = (id: string) => ["education", "summary", id] as const;
+const retry = (count: number, error: Error) => count < 1 && !(error instanceof PublicApiError && (!error.status || error.status < 500));
+
+export function useEducationData() {
+  return useQuery({
+    queryKey: educationKey,
+    queryFn: ({ signal }) => fetchCatalog(signal),
+    staleTime: 60000,
+    refetchOnWindowFocus: true,
+    retry,
+  });
 }
 
-// Fixtures are public-only demo data. Replace this query after public API contracts are approved.
-export function useEducationData() {
-  return useQuery<EducationData>({
-    queryKey: ["education", "demo"],
-    queryFn: async () => ({ courses, summaries, events }),
-    staleTime: Infinity,
+export function useSummary(id?: string) {
+  return useQuery({
+    queryKey: summaryKey(id ?? ""),
+    queryFn: ({ signal }) => fetchSummary(id ?? "", signal),
+    staleTime: 60000,
+    refetchOnWindowFocus: true,
+    retry,
   });
 }

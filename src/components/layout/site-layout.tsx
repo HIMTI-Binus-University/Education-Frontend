@@ -109,10 +109,6 @@ export default function SiteLayout() {
             ))}
           </nav>
         </div>
-        <p className="demo-notice">
-          Frontend preview · All academic content and schedules are demo data,
-          not official publications.
-        </p>
       </footer>
     </div>
   );

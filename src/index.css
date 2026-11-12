@@ -287,12 +287,6 @@ input::placeholder {
 .hero-search button:hover {
   background: #dcecff;
 }
-.preview-label {
-  display: inline-block;
-  margin-top: 17px;
-  font-size: 11px;
-  color: #52678d;
-}
 .home-content,
 .page-content {
   width: min(1160px, calc(100% - 80px));
@@ -583,13 +577,6 @@ input::placeholder {
 }
 .footer-inner nav a:hover {
   color: var(--primary);
-}
-.demo-notice {
-  margin: 25px auto 0;
-  color: var(--muted);
-  font-size: 11px;
-  text-align: center;
-  line-height: 1.8;
 }
 .page-content {
   padding-top: 113px;
@@ -1165,6 +1152,7 @@ input::placeholder {
   font-weight: 700;
 }
 .schedule-toolbar {
+  flex-wrap: wrap;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1726,10 +1714,6 @@ input::placeholder {
     width: 44px;
     height: 44px;
   }
-  .preview-label {
-    font-size: 10px;
-    margin-top: 15px;
-  }
   .home-content,
   .page-content {
     width: calc(100% - 40px);
@@ -1869,11 +1853,6 @@ input::placeholder {
   }
   .footer-inner nav a {
     font-size: 11px;
-  }
-  .demo-notice {
-    text-align: left;
-    margin-top: 15px;
-    font-size: 10px;
   }
   .page-content {
     padding-top: 67px;
@@ -2310,10 +2289,6 @@ input::placeholder {
   scroll-snap-align: start;
   scroll-margin-top: 128px;
   padding-top: 48px;
-}
-.is-home .home-content > .preview-label {
-  display: block;
-  margin: 0 0 28px;
 }
 .is-home .site-footer {
   scroll-snap-align: end;

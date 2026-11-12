@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import SummaryContent from "./summary-content";
-import { summaries } from "../data/demo";
+import { summaries } from "../test/fixtures/education";
 
 describe("Tiptap public reader", () => {
   it("renders a read-only block document with math, code, table, and anchors", async () => {

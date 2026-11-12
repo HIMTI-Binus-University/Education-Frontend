@@ -4,13 +4,22 @@ import {
   useState,
   type FormEvent,
   type KeyboardEvent,
+  type ReactNode,
 } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, Search } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import { AnimatePresence, motion, useIsPresent, useReducedMotion } from "motion/react";
 import { useEducationData } from "../api/education/queries";
-import { findCourses, findSummaries } from "../data/demo";
+import { findCourses, findSummaries } from "../data/education";
+
+function Suggestions({ children }: { children: ReactNode }) {
+  const present = useIsPresent();
+  const reduced = useReducedMotion();
+  return <motion.div className="search-suggestions" aria-hidden={!present} inert={!present} initial={{ opacity: reduced ? 1 : 0, y: reduced ? 0 : -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: reduced ? 0 : -8, transition: { duration: reduced ? 0 : 0.22 } }} transition={{ duration: reduced ? 0 : 0.36, ease: [0.42, 0, 0.18, 1] }}>{children}</motion.div>;
+}
 
 export default function HomeSearch() {
+  const scenePresent = useIsPresent();
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(-1);
@@ -37,7 +46,7 @@ export default function HomeSearch() {
         })),
       ].slice(0, 5)
     : [];
-  const expanded = open;
+  const expanded = open && scenePresent;
   useEffect(() => {
     const media = window.matchMedia?.("(prefers-reduced-motion: reduce)");
     const stop = () => {
@@ -118,6 +127,8 @@ export default function HomeSearch() {
       className="search-stage"
       ref={stage}
       onBlur={(event) => {
+        if (event.currentTarget.closest("[inert]")) return;
+        if (event.relatedTarget instanceof Element && event.relatedTarget.closest('[data-mode="back"]')) return;
         if (!event.currentTarget.contains(event.relatedTarget)) {
           setOpen(false);
           setActive(-1);
@@ -125,7 +136,7 @@ export default function HomeSearch() {
       }}
     >
       <form className="hero-search" role="search" onSubmit={submit}>
-        <Search size={24} aria-hidden="true" />
+        <span className="home-search-icon-slot" aria-hidden="true" />
         <label htmlFor="home-search" className="sr-only">
           Search courses and materials
         </label>
@@ -152,8 +163,9 @@ export default function HomeSearch() {
           <ArrowRight size={22} />
         </button>
       </form>
+      <AnimatePresence>
       {expanded && (
-        <div className="search-suggestions">
+        <Suggestions key="suggestions">
           <p className="suggestions-caption" role="status">
             {query.isPending
               ? "Loading suggestions…"
@@ -189,8 +201,9 @@ export default function HomeSearch() {
               </li>
             ))}
           </ul>
-        </div>
+        </Suggestions>
       )}
+      </AnimatePresence>
     </div>
   );
 }

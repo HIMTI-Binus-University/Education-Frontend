@@ -1,7 +1,7 @@
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { ArrowLeft, ArrowRight, GraduationCap, Search } from "lucide-react";
 import DataBoundary, { NotFound } from "../../components/data-boundary";
-import { findCourses } from "../../data/demo";
+import { findCourses } from "../../data/education";
 import {
   BookOpen,
   CalendarDays,
@@ -76,7 +76,7 @@ export default function CoursesPage() {
               </label>
             </div>
             <p className="results-caption" role="status">
-              {courses.length} demo{" "}
+              {courses.length}{" "}
               {courses.length === 1 ? "course" : "courses"}
             </p>
             {courses.length ? (
@@ -141,7 +141,7 @@ export function CoursePage() {
                   <span>
                     <GraduationCap size={18} />
                     Semester {course.semester} ·{" "}
-                    {course.semester % 2 ? "Odd" : "Even"} · Demo course
+                    {course.semester % 2 ? "Odd" : "Even"}
                   </span>
                 </div>
               </div>

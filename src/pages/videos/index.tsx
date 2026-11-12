@@ -3,7 +3,7 @@ import { Play, Video } from "lucide-react";
 import DataBoundary from "../../components/data-boundary";
 import { Breadcrumb, EmptyState } from "../../components/resources";
 import { eventDate } from "../../utils/date";
-import { youtubeEmbedUrl } from "../../data/demo";
+import { youtubeEmbedUrl } from "../../data/education";
 
 export default function VideosPage() {
   const [params, setParams] = useSearchParams();
@@ -126,7 +126,7 @@ export default function VideosPage() {
                 }
               >
                 Recordings will appear after a session's YouTube link is
-                published. This preview does not use invented video URLs.
+                published.
               </EmptyState>
             )}
           </div>

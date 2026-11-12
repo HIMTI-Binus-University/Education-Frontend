@@ -8,6 +8,7 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
+          "home-motion": ["motion/react"],
           "reader-math": ["katex"],
           "reader-code": ["lowlight"],
           "reader-engine": [

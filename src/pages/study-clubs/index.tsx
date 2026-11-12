@@ -17,8 +17,8 @@ import {
   EventList,
   ExternalAction,
 } from "../../components/resources";
-import { eventDate, eventTime } from "../../utils/date";
-import { youtubeEmbedUrl } from "../../data/demo";
+import { eventDate, eventDateKey, eventTime } from "../../utils/date";
+import { youtubeEmbedUrl } from "../../data/education";
 
 const monthLabel = (year: number, month: number) =>
   new Intl.DateTimeFormat("en-GB", {
@@ -29,18 +29,19 @@ const monthLabel = (year: number, month: number) =>
 
 export default function SchedulePage() {
   const [params, setParams] = useSearchParams();
-  const now = new Date();
+  const today = eventDateKey(new Date().toISOString());
   const parsedMonth = params.get("month");
   const validMonth =
     parsedMonth &&
     /^\d{4}-(0[1-9]|1[0-2])$/.test(parsedMonth) &&
     Number(parsedMonth.slice(0, 4)) >= 1900 &&
     Number(parsedMonth.slice(0, 4)) <= 2100;
-  const year = validMonth ? Number(parsedMonth.slice(0, 4)) : now.getFullYear();
-  const month = validMonth ? Number(parsedMonth.slice(5)) - 1 : now.getMonth();
+  const year = validMonth ? Number(parsedMonth.slice(0, 4)) : Number(today.slice(0, 4));
+  const month = validMonth ? Number(parsedMonth.slice(5)) - 1 : Number(today.slice(5, 7)) - 1;
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
   const type = params.get("type") ?? "";
   const courseId = params.get("course") ?? "";
+  const semester = params.get("semester") ?? "";
   const monthKey = `${year}-${String(month + 1).padStart(2, "0")}`;
   const offset = (new Date(Date.UTC(year, month, 1)).getUTCDay() + 6) % 7;
   const days = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
@@ -67,13 +68,14 @@ export default function SchedulePage() {
       {(data) => {
         const filtered = data.events.filter(
           (event) =>
-            event.startsAt.startsWith(monthKey) &&
+            eventDateKey(event.startsAt).startsWith(monthKey) &&
             (!type || event.type === type) &&
-            (!courseId || event.courseId === courseId),
+            (!courseId || event.courseId === courseId) &&
+            (!semester || data.courses.some((course) => course.id === event.courseId && String(course.semester) === semester)),
         );
         const shown = filtered.filter(
           (event) =>
-            !selectedDay || Number(event.startsAt.slice(8, 10)) === selectedDay,
+            !selectedDay || Number(eventDateKey(event.startsAt).slice(8, 10)) === selectedDay,
         );
         return (
           <div className="page-content">
@@ -104,6 +106,15 @@ export default function SchedulePage() {
                 ))}
               </div>
               <label className="select-field">
+                <span className="sr-only">Filter events by semester</span>
+                <select value={semester} onChange={(event) => update("semester", event.target.value)}>
+                  <option value="">All semesters</option>
+                  {[...new Set(data.courses.map((course) => course.semester))].sort((a, b) => a - b).map((value) => (
+                    <option key={value} value={value}>Semester {value}</option>
+                  ))}
+                </select>
+              </label>
+              <label className="select-field">
                 <span className="sr-only">Filter events by course</span>
                 <select
                   value={courseId}
@@ -118,9 +129,6 @@ export default function SchedulePage() {
                 </select>
               </label>
             </div>
-            <p className="period-caption">
-              Demo schedule · Example sessions are in November 2026.
-            </p>
             <div className="schedule-layout">
               <section className="calendar panel" aria-label="Session calendar">
                 <div className="calendar-top">
@@ -157,7 +165,7 @@ export default function SchedulePage() {
                     {Array.from({ length: days }, (_, index) => {
                       const day = index + 1;
                       const sessions = filtered.filter(
-                        (event) => Number(event.startsAt.slice(8, 10)) === day,
+                        (event) => Number(eventDateKey(event.startsAt).slice(8, 10)) === day,
                       );
                       return (
                         <button
@@ -251,14 +259,14 @@ export function EventPage() {
               ]}
             />
             <Link
-              to={`/study-clubs?month=${event.startsAt.slice(0, 7)}`}
+              to={`/study-clubs?month=${eventDateKey(event.startsAt).slice(0, 7)}`}
               className="text-link back-link"
             >
               <ArrowLeft size={17} />
               Back to schedule
             </Link>
             <header className="page-heading">
-              <p className="context-label">{event.type} · Demo event</p>
+              <p className="context-label">{event.type}</p>
               <h1>{event.title}</h1>
               <Link className="text-link" to={`/courses/${event.courseId}`}>
                 {course?.name}
@@ -319,8 +327,7 @@ export function EventPage() {
                 </div>
                 {!event.meetingUrl && !event.registrationUrl && (
                   <p className="helper-copy">
-                    Meeting and registration links have not been supplied for
-                    this demo.
+                    Meeting and registration links are not available yet.
                   </p>
                 )}
                 {youtubeEmbedUrl(event.recordingUrl) && (

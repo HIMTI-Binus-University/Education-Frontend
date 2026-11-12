@@ -136,7 +136,6 @@ export default function ReaderOutline({ headings }: { headings: string[] }) {
           </li>
         ))}
       </ol>
-      <p>Demo content. No student login needed.</p>
     </aside>
   );
 }

@@ -1,4 +1,6 @@
 const dateOptions = { timeZone: "Asia/Jakarta" };
+export const eventDateKey = (iso: string) =>
+  new Intl.DateTimeFormat("en-CA", { ...dateOptions, year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date(iso));
 export const eventDay = (iso: string) =>
   new Intl.DateTimeFormat("en-GB", { ...dateOptions, day: "2-digit" }).format(
     new Date(iso),

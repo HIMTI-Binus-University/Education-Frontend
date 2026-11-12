@@ -4,7 +4,7 @@ The public Responsi Reader now uses Tiptap 3 (`@tiptap/react`), not Markdown. Th
 
 ## Data and rendering
 
-- `Summary.content` is a Tiptap `JSONContent` document. `src/data/summary-documents.ts` contains the four converted, explicitly labeled demo summaries. Existing academic meaning, links, formulas, lists, code, and table content are preserved.
+- `Summary.content` is a Tiptap `JSONContent` document loaded on demand from the public summary endpoint. Production includes no bundled documents. Synthetic regression documents live only in `src/test/fixtures/summary-documents.ts` and are not imported by application code.
 - `src/components/summary-content.tsx` owns the read-only renderer, loaded only when opening a summary. No toolbar, upload, editing, saving, collaboration, or paid Tiptap service is included.
 - Schema: StarterKit paragraphs, h2/h3, lists, quotes, inline marks, links, rules, and hard breaks; TableKit row/cell/header plus an accessible read-only table wrapper; Image; CodeBlockLowlight; Mathematics `inlineMath`/`blockMath` with `attrs.latex`.
 - Heading IDs are rendered through schema attributes, not patched into DOM after rendering. The outline reads level-two headings from the same JSON in document order. Changing summaries recreates the editor so stale content/anchors are not reused.
@@ -25,9 +25,11 @@ Verification: 23 component tests, lint, build, and browser checks at 1440/768/39
 
 ## Integration boundary
 
-These are local demo fixtures, not a finalized backend contract. Agree on the exact node/mark names and extension versions with the publishing backend before connecting public documents. Unsupported blocks and old serialized content need an explicit migration/validation policy; the public reader does not guess conversions or expose write endpoints.
+The frontend transport follows [API-CONTRACT.md](../API-CONTRACT.md), including metadata-only catalog responses, separate detail retrieval, validation and 404/error handling. The backend must implement that contract and validate the exact node/mark schema before publishing. Unsupported blocks and old serialized content need an explicit migration/validation policy; the public reader does not guess conversions or expose write endpoints.
 
 ## Verification and delivery gate
+
+The following is historical demo-phase proof, not a description of production data. Current production readiness and backend requirements are in README and API-CONTRACT.md; no demo labeling/content is shipped.
 
 PASS: build, lint, 21 tests, and 16 real-browser route/width checks (four documents at 1440/768/390/320px). Browser checks exercise read-only typing, highlighted code, inline/block math, focusable table scrolling, outline navigation clear of the sticky header, and search/course-to-Reader navigation without console/page warnings or errors. Tests also cover switching documents and rejecting unsafe link/image protocols while allowing public image URLs.
 

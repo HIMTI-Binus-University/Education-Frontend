@@ -20,9 +20,9 @@ import {
   safeExternalUrl,
   youtubeEmbedUrl,
   type Course,
-  type Summary,
+  type SummaryMetadata,
   type AcademicEvent,
-} from "../data/demo";
+} from "../data/education";
 import { eventDay, eventMonth, eventTime } from "../utils/date";
 
 const courseIcons: Record<Course["icon"], LucideIcon> = {
@@ -120,7 +120,7 @@ export function SummaryList({
   summaries,
   courses,
 }: {
-  summaries: Summary[];
+  summaries: SummaryMetadata[];
   courses: Course[];
 }) {
   return (
@@ -151,7 +151,7 @@ export function SummaryCourses({
   summaries,
   courses,
 }: {
-  summaries: Summary[];
+  summaries: SummaryMetadata[];
   courses: Course[];
 }) {
   const courseIds = [...new Set(summaries.map((summary) => summary.courseId))];
@@ -239,8 +239,7 @@ export function RecordingList({
   if (!recordings.length)
     return (
       <EmptyState icon={Video} title="Recordings are on their way">
-        Published Study Club and Responsi recordings will appear here. No video
-        URLs have been supplied for this demo.
+        Published Study Club and Responsi recordings will appear here when available.
       </EmptyState>
     );
   return (

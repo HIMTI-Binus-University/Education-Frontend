@@ -1,9 +1,13 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-28T00:00:00Z",
+  "generatedAt": "2026-11-10T00:00:00Z",
   "title": "Design System: HIMTI Education",
   "extensions": {
     "colorMeta": {
+      "launcher-outline": { "role": "neutral", "displayName": "Home circle boundary" },
+      "launcher-navy": { "role": "primary", "displayName": "Home course and selected identity navy" },
+      "launcher-hover-outline": { "role": "neutral", "displayName": "Decorative Home hover boundary" },
+      "launcher-search-outline": { "role": "neutral", "displayName": "Home Search capsule boundary" },
       "primary-hover": { "role": "primary", "displayName": "Action blue hover", "tonalRamp": ["oklch(15% .14 260)", "oklch(27% .14 260)", "oklch(39% .14 260)", "oklch(51% .14 260)", "oklch(63% .14 260)", "oklch(75% .14 260)", "oklch(85% .14 260)", "oklch(95% .14 260)"] },
       "secondary-bg": { "role": "neutral", "displayName": "Supporting action wash", "tonalRamp": ["oklch(15% .02 255)", "oklch(27% .02 255)", "oklch(39% .02 255)", "oklch(51% .02 255)", "oklch(63% .02 255)", "oklch(75% .02 255)", "oklch(85% .02 255)", "oklch(95% .02 255)"] },
       "secondary-ink": { "role": "primary", "displayName": "Supporting action blue", "tonalRamp": ["oklch(15% .14 260)", "oklch(27% .14 260)", "oklch(39% .14 260)", "oklch(51% .14 260)", "oklch(63% .14 260)", "oklch(75% .14 260)", "oklch(85% .14 260)", "oklch(95% .14 260)"] },
@@ -23,23 +27,53 @@
       "pale": { "role": "neutral", "displayName": "Selection wash", "tonalRamp": ["oklch(15% 0.025 255)", "oklch(27% 0.025 255)", "oklch(39% 0.025 255)", "oklch(51% 0.025 255)", "oklch(63% 0.025 255)", "oklch(75% 0.025 255)", "oklch(85% 0.025 255)", "oklch(95% 0.025 255)"] }
     },
     "typographyMeta": {
-      "display": { "displayName": "Search-led hero", "purpose": "Homepage emphasis; responsive overrides are documented in DESIGN.md." },
+      "display": { "displayName": "Legacy display", "purpose": "Retained incumbent role; Home now uses launcher-heading." },
+      "launcher-heading": { "displayName": "Home mode heading", "purpose": "Orient root course discovery, selected-course resources, or Search; mobile override in DESIGN.md." },
+      "launcher-label": { "displayName": "Home circle label", "purpose": "Name each actual task; 14px desktop, 12px mobile. Course name 12px/1.35; code 10px/1.2. Search Back 12px/1.3." },
+      "launcher-numeral": { "displayName": "Unused semester numeral", "purpose": "Retained unused source style, not a live course-first control or a recommendation for new surfaces. No semester bubbles exist." },
+      "launcher-filter": { "displayName": "Compact Home semester filter", "purpose": "Native select above root field, 12px type, minimum 44px target; data-derived demo count also 12px. Scoped exception to non-Home mobile select type." },
       "headline": { "displayName": "Page heading", "purpose": "Discovery, course, and reader titles." },
       "title": { "displayName": "Section title", "purpose": "Academic resource groups." },
       "body": { "displayName": "Reader body", "purpose": "Long-form summary reading; not the size of every UI paragraph." },
       "label": { "displayName": "Button label", "purpose": "Compact action hierarchy." }
     },
     "shadows": [
+      { "name": "launcher-rest", "value": "0 12px 24px -18px #0b245261", "purpose": "Home-only tactile launcher elevation; white circles also use an inset 1px #d5e5fb boundary." },
+      { "name": "launcher-hover", "value": "inset 0 0 0 2px #8bb7f6, 0 14px 28px -18px #0b245280", "purpose": "Identify the currently actionable circle without enlarging its visual above 1." },
+      { "name": "launcher-search", "value": "inset 0 0 0 1px #a9cafa, 0 8px 28px -16px #0059d66b", "purpose": "Separate the morphed Search input from the field." },
       { "name": "header", "value": "0 8px 30px -16px #173c742b", "purpose": "Separate floating navigation from the page." },
       { "name": "hero-search", "value": "0 9px 25px -15px #244f8c45", "purpose": "Emphasize the main discovery control." },
       { "name": "mobile-navigation", "value": "0 14px 24px -15px #173c7433", "purpose": "Separate the expanded navigation layer." },
       { "name": "calendar-selected", "value": "inset 0 0 0 1px #7daef0", "purpose": "Selection stroke, not ambient depth." }
     ],
     "motion": [
+      { "name": "launcher-entry", "value": "opacity 0 to 1, 240ms", "purpose": "Orient scene changes; duration zero with reduced motion." },
+      { "name": "launcher-focus", "value": "spring stiffness 320, damping 34", "purpose": "Pan keyboard-focused circles into view except restored focus/fixed Search Back; jump with reduced motion." },
+      { "name": "launcher-recenter", "value": "spring stiffness 300, damping 34", "purpose": "Return pan to origin; jump with reduced motion." },
+      { "name": "launcher-drag", "value": "threshold 8px; elasticity .06; inertia power .16, timeConstant 220, bounceStiffness 400, bounceDamping 35", "purpose": "Constrained direct manipulation with post-drag pointer-click suppression; reduced motion disables inertia, not direct scaling." },
+      { "name": "launcher-search-morph", "value": "shared layoutId search-shape; spring stiffness 260, damping 32", "purpose": "Circle-to-72px-input continuity, not a fade substitute; duration zero with reduced motion." },
+      { "name": "launcher-course-continuity", "value": "shared layoutId course-<id>; spring stiffness 320, damping 34", "purpose": "Retain subject context from root satellite button to static selected-course center; reduced motion uses duration zero." },
+      { "name": "launcher-search-content", "value": "180ms opacity fade after 220ms", "purpose": "Reveal controls after morph, then focus input; no delay/duration with reduced motion." },
       { "name": "control-feedback", "value": "background 0.15s ease-out", "purpose": "Hover feedback; disabled under prefers-reduced-motion." },
       { "name": "course-feedback", "value": "border-color 0.16s ease-out, background 0.16s ease-out", "purpose": "Linked-card hover feedback." },
       { "name": "anchor-scroll", "value": "smooth", "purpose": "Summary outline navigation; auto under reduced motion." }
     ],
+    "homeLauncher": {
+      "scope": "Additive Home documentation only; unrelated stale incumbent tokens and snippets are not regenerated or certified.",
+      "source": ["src/pages/home/index.tsx", "src/pages/home/watch-field.tsx", "src/pages/home/watch-geometry.ts", "src/pages/home/launcher.css"],
+      "direction": { "energy": 2, "rhythm": 2, "motion": 3 },
+      "geometry": "Root Search at item 0 (0,0) plus six demo course buttons. ResizeObserver size=min(160,max(112,(width-64)/2.5)); spacing size+18. Desktop hexagonal rings; compact staggered two-column orbit when width<size*3+60. Item 0 remains centered in both layouts. Per-circle edgeScale unchanged: clamp(0,1,min(width/2-abs(x)-10,height/2-abs(y)-10)/(size*.6)); native hitboxes unchanged.",
+      "height": "Runtime inline height=max(420,ceil(2*(max(abs(y))+size*.6+14))), overriding CSS fallback. Six-course compact fields roughly 614–640px keep initial visuals scale 1. Phone page intentionally scrolls; no all-options-first-viewport promise. Search fixed 520px.",
+      "containment": "overflow:hidden and contain:paint; field top margin 28px, 24px mobile, root select above field. Field radius 36px/24px mobile. No circle may paint over title/description during drag.",
+      "filter": "Native semester select above root field defaults All semesters; sorted values derive from catalog (demo 1/3/5). Filters courses rather than navigation stages, includes courses without materials. Count derives from visible data and is labeled demo. Select type 12px, minimum height 44px. No semester bubble controls.",
+      "search": "Cross-semester despite root filter. Shared search-shape morph to white 72px/radius-36px input; suggestions max-height 220px. Fixed Back 88px with 28px icon, 6px gap, 10px padding and 12px/1.3 label, separate from suggestions. Back retains filter and restores Search focus.",
+      "interaction": "Current local-contact layout uses 18 demo courses and larger white resources max(80,round(size*.7)), with 12px labels and 24px icons. Root scale remains 1, with field-edge shrink only. Selected anchor stays fixed; colliding neighbors are pushed locally, choosing layouts with fewer affected roots and less displacement, and restore on deselection. Default field height never changes on selection. Dense catalogs use compact placement below width size*5+100. Geometry is memoized and edge shrink follows animated positions. Ring-only selection, behind-parent reveal, reduced motion, direct Search Back and inert reverse-morph source remain. This supersedes global .55 shrinking and earlier expanding rows; current evidence in docs/HOME-LAUNCHER.md.",
+      "content": "Shared circle content height 100% and text-align center ensure multiline centering; selected course name weight 750. Root data pending/error/refetch/empty keeps Search; missing selected course keeps Back and explicit unavailable status.",
+      "provenance": "Motion 14.11.1 retained, public motion/react independently implements https://motion.dev/examples/react-apple-watch-home-screen#preview. Premium Motion+ source gated, not copied. No new dependency, assets or backend; existing logo unchanged.",
+      "delivery": "Latest index 343.39kB (gzip 108.17kB), retained Motion chunk 167.92kB. Static imports still load Motion, not lazy loading. No npm install/audit this increment; older seven-moderate TypeScript ESLint/minimatch tooling findings are historical only. Detector ran once, advisory incumbent font steps 10/11/12/18/38, no hard errors; unrelated drift not repaired or canonized.",
+      "precedence": "Latest approved course-first plan replaces feature-to-semester-to-course and historical Home hero/feed rules. Separate Courses directory and all non-Home pages unchanged; preserve unrelated tokens. Checkpoint 00b97f6 untouched, latest changes uncommitted/unpushed per parent handoff.",
+      "review": "Fresh independent review SHIP, zero material fixes; all ten settled top-position captures reviewed: course-first-home-{1440,1024,768,390,320}.png, course-first-resource-{1440,390,320}.png, course-first-search-{1440,390}.png under .impeccable/review/. Tall phone scroll explicitly accepted. Motion assessment source plus parent runtime proof, not direct browser review. No separate comp or QualityBar supplied; approved plan and brief are authority. Parent course-first-check.cjs PASS five widths, no errors/overflow; 39 tests PASS (3 geometry, 27 App plus others), lint PASS. Subsequent CSS-only text-align fix; build/browser reran PASS, no JS changes since tests. Diff check PASS before docs. No doc-pass runs, data API/backend or Safari/physical-device certification. Ledger and per-rule DURING gate in docs/HOME-LAUNCHER.md."
+    },
     "breakpoints": [
       { "name": "mobile-max", "value": "640px" },
       { "name": "tablet-max", "value": "900px" },
@@ -48,6 +82,12 @@
     ]
   },
   "components": [
+    {
+      "name": "Home Search Circle", "kind": "button", "refersTo": "launcher-search",
+      "description": "Static visual preview only, not a Motion runtime simulation. Application morphs to all-semester Search; native 112–160px hitboxes and independent edge scaling are documented in extensions.homeLauncher.",
+      "html": "<button class=\"ds-launcher\" type=\"button\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" aria-hidden=\"true\"><circle cx=\"11\" cy=\"11\" r=\"8\"/><path d=\"m21 21-4.3-4.3\"/></svg><span>Search</span></button>",
+      "css": ".ds-launcher{width:160px;height:160px;border-radius:50%;border:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:18px;background:#fff;color:var(--primary,#0059d6);font:650 14px 'Plus Jakarta Sans',system-ui,sans-serif;box-shadow:inset 0 0 0 1px #d5e5fb,0 12px 24px -18px #0b245261}.ds-launcher svg{width:38px;height:38px}.ds-launcher:hover{box-shadow:inset 0 0 0 2px #8bb7f6,0 14px 28px -18px #0b245280}.ds-launcher:focus-visible{outline:3px solid var(--primary,#0059d6);outline-offset:5px}@media(max-width:640px){.ds-launcher{width:112px;height:112px;font-size:12px;gap:6px;padding:10px}.ds-launcher svg{width:30px;height:30px}}"
+    },
     {
       "name": "Primary Button", "kind": "button", "refersTo": "button-primary",
       "description": "Main available action. Preview uses an existing retry label.",
@@ -99,7 +139,7 @@
   ],
   "narrative": {
     "northStar": "HIMTI resource-first reference",
-    "overview": "The user's pinned screenshot is the visual authority: HIMTI blue and navy, white panels, pale blue surroundings, and Plus Jakarta Sans. The generous search-led introduction gives way to denser academic cards, summary rows, and schedules. This records the built system, not a new visual direction.\n\nLight mode is intentional to match that reference and support studying. ENERGY 2 / RHYTHM 2 / MOTION 1: emphasis comes from typography and resource hierarchy, with hover/focus feedback rather than entrance animation.",
+    "overview": "The user's pinned screenshot remains the shared-shell visual authority: HIMTI blue and navy, white panels, pale blue surroundings, and Plus Jakarta Sans. Academic directories retain denser cards, summary rows, and schedules. Home now follows the explicitly requested circular launcher, not the retired hero/resource feed.\n\nLight mode is intentional to match that reference and support studying. Home's approved direction is ENERGY 2 / RHYTHM 2 / MOTION 3: interactive panning and finite mode reveals, without continuous animation. This Home-specific update takes precedence over older Home hero, feed, scroll-snap, reveal, and motion statements here and in `docs/MOTION.md` or the earlier education surface brief. It does not change non-Home styling rules. See `.impeccable/surfaces/home-launcher.md` and `docs/HOME-LAUNCHER.md`.",
     "keyCharacteristics": [
       "Blue actions, navy headings, muted academic metadata.",
       "Rounded white panels, semantic icon tiles, and linked resource rows.",
@@ -111,12 +151,12 @@
     "dos": [
       "Do preserve the approved light HIMTI reference, existing logo, and Plus Jakarta Sans commitment.",
       "Do keep demo academic content visibly labeled and show useful empty, loading, and error states.",
-      "Do preserve keyboard focus, mobile 16px fields, and local reader overflow containment."
+       "Do preserve keyboard focus, mobile 16px text inputs, the scoped Home select, and local reader overflow containment."
     ],
     "donts": [
       "Don't invent academic claims, identities, availability, or recording links to fill panels.",
       "Don't turn the provisional Markdown renderer into a promised Tiptap schema.",
-      "Don't replace the resource hierarchy with decorative icons, a background grid, or entrance animation."
+      "Don't let the user-requested background grid compete with reading surfaces; Home motion stays scoped to launcher interactions, not retired resource groups."
     ]
   }
 }

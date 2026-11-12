@@ -11,7 +11,7 @@ npm ci
 npm run dev
 ```
 
-Open `http://localhost:3000`. The work is in the existing `dev` worktree; no branches were switched or merged.
+Copy `.env.example` to `.env.local` if the API prefix needs changing, then open `http://localhost:3000`. The default is same-origin `/api/public`. Vite exposes `VITE_*` values to the browser; never put secrets there.
 
 ```sh
 npm run build
@@ -32,28 +32,31 @@ npm test
 | `/study-clubs/:eventId` | Event details and optional external actions |
 | `/videos` | Recording discovery and YouTube embed when a URL exists |
 
-Calendar month, event/course filters, and summary queries are shareable URL parameters. Event times display in Asia/Jakarta (WIB). Try `/study-clubs?month=2026-11` for the demonstration schedule.
+Calendar month, event/course filters, and summary queries are shareable URL parameters. Event dates and times display in Asia/Jakarta (WIB).
 
-## Demo data and integration boundary
+## Production data and deployment
 
-This is a frontend preview, not a connected publication system. All academic content and schedules are explicitly labeled demo. No real recording, registration, or meeting URLs were provided, so those controls are omitted rather than fabricated. Valid recording and external-link wiring is covered by fixture-based tests.
+The app requests real public API data. There is **no bundled demo catalog, document, event, contributor, or fallback seed**. Synthetic data exists only in test fixtures and is not imported by production code. An empty catalog renders empty states; API/network/schema errors render retry states instead of fabricated content.
 
-`src/api/education/queries.ts` is the replacement point for the demo retrieval; fixtures and provisional display types are in `src/data/demo.ts`. Public API endpoints and response formats are deliberately not invented. Before integration, agree on:
+The implemented frontend contract is [API-CONTRACT.md](API-CONTRACT.md):
 
-- Course/academic-period identifiers, current exam context, pagination and query contracts.
-- Public summary visibility, direct-resource access, publication freshness, and archive retention enforced by the backend.
-- Match the backend's Tiptap JSON and extension schema to the public reader. The current reader uses Tiptap 3 with read-only StarterKit blocks, tables, public images, highlighted code, and inline/block math. See `docs/TIPTAP.md`; there is no public authoring or save workflow.
-- Public event visibility, recording availability, and optional external-link fields.
+- `GET /api/public/catalog`: complete public metadata snapshot; no summary bodies.
+- `GET /api/public/summaries/{id}`: read-only Tiptap document, loaded only in the Reader.
+- API transport has cancellation, a 15-second timeout, bounded retries and runtime response validation. The backend must still enforce publication/retention rules and validate content before publishing.
+- Frontend cache becomes stale after 60 seconds and refreshes on mount/window focus. No realtime polling is claimed.
 
-No authentication, management UI, backend, database schema, storage, or collaboration infrastructure is included. No fixed public archive duration is assumed.
+Build with `npm run build` and deploy `dist/` to a static HTTPS host. Set the API prefix **at build time**. Configure SPA fallbacks for frontend routes, excluding `/api/*`; never return `index.html` for an API request. Revalidate HTML, cache hashed assets immutably, and configure CORS/security headers/CSP for the actual infrastructure. See the deployment checklist in the contract.
+
+No authentication, management UI, backend, database schema, storage, or collaboration infrastructure is included. The backend is not supplied or deployed by this repository. **Go-live requires both endpoints and a real-backend smoke test**; without them the frontend correctly shows an API error. No public archive duration is assumed.
 
 ## Structure
 
 - `src/pages`: route-level screens and supporting compositions.
 - `src/components`: shared resources, public layout, data boundary, and lazy summary renderer.
-- `src/api`: TanStack Query data retrieval.
+- `src/api`: validated public API transport and TanStack Query retrieval.
 - `src/config`: Query configuration.
-- `src/data`: labeled demo fixtures and provisional types.
+- `src/data`: public domain types and search/URL helpers, no academic records.
+- `src/test/fixtures`: synthetic test-only records/documents, excluded from the application import graph.
 - `src/utils`: date display helpers.
 
 Brand asset provenance is in `docs/ASSETS.md`. Product context and the approved visual direction are in `PRODUCT.md` and `.impeccable/surfaces/education.md`.

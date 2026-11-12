@@ -19,8 +19,8 @@ import {
 import {
   findCourses,
   findSummaries,
-  demoAcademicContext,
-} from "../../data/demo";
+} from "../../data/education";
+import { useSummary } from "../../api/education/queries";
 
 const SummaryContent = lazy(() => import("../../components/summary-content"));
 
@@ -28,13 +28,16 @@ export default function SummariesPage() {
   const [params, setParams] = useSearchParams();
   const search = params.get("q") ?? "";
   const course = params.get("course") ?? "";
+  const semester = params.get("semester") ?? "";
   return (
     <DataBoundary>
       {(data) => {
-        const results = findSummaries(data.summaries, search, course);
+        const results = findSummaries(data.summaries, search, course).filter(
+          (item) => !semester || String(item.semester) === semester,
+        );
         const matchingCourses = search.trim()
           ? findCourses(data.courses, search).filter(
-              (item) => !course || item.id === course,
+              (item) => (!course || item.id === course) && (!semester || String(item.semester) === semester),
             )
           : [];
         const showMaterials = Boolean(search.trim() || course);
@@ -57,6 +60,15 @@ export default function SummariesPage() {
               </p>
             </div>
             <div className="filter-bar">
+              <label className="select-field">
+                <span className="sr-only">Filter summaries by semester</span>
+                <select value={semester} onChange={(event) => update("semester", event.target.value)}>
+                  <option value="">All semesters</option>
+                  {[...new Set(data.courses.map((item) => item.semester))].sort((a, b) => a - b).map((value) => (
+                    <option key={value} value={value}>Semester {value}</option>
+                  ))}
+                </select>
+              </label>
               <div className="search-field">
                 <Search size={20} aria-hidden="true" />
                 <label htmlFor="summary-search" className="sr-only">
@@ -85,7 +97,6 @@ export default function SummariesPage() {
               </label>
             </div>
             <div className="listing-context">
-              <span>{demoAcademicContext}</span>
               <span role="status">
                 {matchingCourses.length > 0 &&
                   `${matchingCourses.length} ${matchingCourses.length === 1 ? "course" : "courses"} · `}
@@ -136,11 +147,14 @@ export default function SummariesPage() {
 
 export function ReaderPage() {
   const { summaryId } = useParams();
+  const query = useSummary(summaryId);
+  if (query.isPending) return <div className="page-content" role="status" aria-busy="true">Loading summary…</div>;
+  if (query.isError) return <div className="page-content"><div className="empty-state panel" role="alert"><h1>Summary could not be loaded</h1><p>Please try again.</p><button className="button primary" onClick={() => void query.refetch()}>Try again</button></div></div>;
+  const summary = query.data;
+  if (!summary) return <NotFound subject="Summary" />;
   return (
     <DataBoundary>
       {(data) => {
-        const summary = data.summaries.find((item) => item.id === summaryId);
-        if (!summary) return <NotFound subject="Summary" />;
         const course = data.courses.find(
           (item) => item.id === summary.courseId,
         );
@@ -169,7 +183,7 @@ export function ReaderPage() {
               Back to {course?.name ?? "course"}
             </Link>
             <header className="reader-heading">
-              <p className="context-label">Demo summary · {course?.name}</p>
+              <p className="context-label">{course?.name}</p>
               <h1>{summary.title}</h1>
               <div className="reader-details">
                 <div className="reader-meta">

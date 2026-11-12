@@ -1,45 +1,5 @@
-import type { JSONContent } from "@tiptap/react";
+import type { Course, Summary, AcademicEvent } from "../../data/education";
 import { summaryDocuments } from "./summary-documents";
-
-export interface Course {
-  id: string;
-  name: string;
-  code: string;
-  semester: number;
-  icon: "code" | "database" | "math" | "box" | "network" | "terminal";
-  description: string;
-}
-
-export interface Contributor {
-  id: string;
-  displayName: string;
-}
-
-export interface Summary {
-  id: string;
-  title: string;
-  courseId: string;
-  academicPeriod: string;
-  semester: number;
-  examType: "Mid Exam" | "Final Exam";
-  contributors: Contributor[];
-  content: JSONContent;
-}
-
-export interface AcademicEvent {
-  id: string;
-  title: string;
-  type: "Study Club" | "Responsi";
-  courseId: string;
-  startsAt: string;
-  endsAt: string;
-  location: string;
-  description: string;
-  meetingUrl?: string;
-  registrationUrl?: string;
-  quota?: number;
-  recordingUrl?: string;
-}
 
 export const courses: Course[] = [
   {
@@ -94,6 +54,18 @@ export const courses: Course[] = [
     icon: "terminal",
     description: "Explore processes, concurrency, and resource management.",
   },
+  { id: "discrete-math", name: "Discrete Mathematics", code: "DMATH", semester: 1, icon: "math", description: "Demo course covering logic, sets, graphs, and counting." },
+  { id: "linear-algebra", name: "Linear Algebra", code: "LINALG", semester: 1, icon: "math", description: "Demo course covering vectors, matrices, and linear transformations." },
+  { id: "data-structures", name: "Data Structures", code: "DS", semester: 3, icon: "code", description: "Demo course covering lists, trees, hash tables, and algorithm analysis." },
+  { id: "object-oriented", name: "Object-Oriented Programming", code: "OOP", semester: 3, icon: "code", description: "Demo course covering objects, interfaces, and reusable program design." },
+  { id: "statistics", name: "Probability & Statistics", code: "STAT", semester: 3, icon: "math", description: "Demo course covering probability, distributions, and statistical inference." },
+  { id: "software-engineering", name: "Software Engineering", code: "SE", semester: 5, icon: "box", description: "Demo course covering requirements, testing, and software delivery." },
+  { id: "web-programming", name: "Web Programming", code: "WEB", semester: 5, icon: "code", description: "Demo course covering browser applications, HTTP, and web development." },
+  { id: "human-computer", name: "Human–Computer Interaction", code: "HCI", semester: 5, icon: "box", description: "Demo course covering interface design, usability, and accessibility." },
+  { id: "artificial-intelligence", name: "Artificial Intelligence", code: "AI", semester: 5, icon: "network", description: "Demo course covering search, reasoning, and intelligent systems." },
+  { id: "information-security", name: "Information Security", code: "SEC", semester: 5, icon: "terminal", description: "Demo course covering threats, cryptography, and secure systems." },
+  { id: "distributed-systems", name: "Distributed Systems", code: "DIST", semester: 5, icon: "network", description: "Demo course covering coordination, replication, and fault tolerance." },
+  { id: "computer-graphics", name: "Computer Graphics", code: "CG", semester: 5, icon: "box", description: "Demo course covering geometry, rendering, and visual computing." },
 ];
 
 export const summaries: Summary[] = [
@@ -198,59 +170,3 @@ export const events: AcademicEvent[] = [
       "Demo Responsi session covering the instruction cycle, memory hierarchy, and execution-time problems.",
   },
 ];
-
-export const demoAcademicContext = "Demo period: 2026/2027 · Mid Exam";
-
-export function findSummaries(
-  items: Summary[],
-  search: string,
-  courseId: string,
-) {
-  const term = search.trim().toLocaleLowerCase();
-  return items.filter(
-    (item) =>
-      (!courseId || item.courseId === courseId) &&
-      item.title.toLocaleLowerCase().includes(term),
-  );
-}
-
-export function findCourses(items: Course[], search: string) {
-  const term = search.trim().toLocaleLowerCase();
-  return items.filter(
-    (course) =>
-      course.name.toLocaleLowerCase().includes(term) ||
-      course.code.toLocaleLowerCase().includes(term),
-  );
-}
-
-export function youtubeEmbedUrl(raw?: string): string | null {
-  if (!raw) return null;
-  try {
-    const url = new URL(raw);
-    if (url.protocol !== "https:") return null;
-    const host = url.hostname.toLowerCase();
-    const id =
-      host === "youtu.be"
-        ? url.pathname.slice(1)
-        : ["youtube.com", "www.youtube.com", "m.youtube.com"].includes(host)
-          ? url.pathname === "/watch"
-            ? url.searchParams.get("v")
-            : url.pathname.match(/^\/(?:embed|shorts)\/([^/]+)$/)?.[1]
-          : null;
-    return id && /^[\w-]{11}$/.test(id)
-      ? `https://www.youtube-nocookie.com/embed/${id}`
-      : null;
-  } catch {
-    return null;
-  }
-}
-
-export function safeExternalUrl(raw?: string): string | null {
-  if (!raw) return null;
-  try {
-    const url = new URL(raw);
-    return ["https:", "http:"].includes(url.protocol) ? url.href : null;
-  } catch {
-    return null;
-  }
-}
