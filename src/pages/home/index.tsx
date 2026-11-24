@@ -1,82 +1,103 @@
 import { useState } from "react";
-import { CheckCircle2, CircleX, LoaderCircle, Plus, RefreshCw } from "lucide-react";
-import { useHealth } from "@/api/health/queries";
-import { PageLayout } from "@/components/layout/page-layout";
-import { Button } from "@/components/ui/button";
+import { LayoutGroup, MotionConfig, motion, useReducedMotion } from "motion/react";
+import { ArrowLeft, BookOpen, Search, Users } from "lucide-react";
+import HomeSearch from "../../components/home-search";
+import { CourseIcon } from "../../components/resources";
+import { useEducationData } from "../../api/education/queries";
+import WatchField, { type WatchItem } from "./watch-field";
+import { watchTransition } from "./watch-motion";
+import "./launcher.css";
 
 export default function HomePage() {
-  const [count, setCount] = useState(0);
-  const { data, isError, isFetching, isPending, refetch } = useHealth();
+  const [mode, setMode] = useState<"home" | "search">("home");
+  const [semester, setSemester] = useState("");
+  const [courseId, setCourseId] = useState<string>();
+  const [focusId, setFocusId] = useState<string>();
+  const query = useEducationData();
+  const reduced = useReducedMotion();
+  const selectedCourse = query.data?.courses.find((course) => course.id === courseId);
+  const visibleCourses = query.data?.courses.filter((course) => !semester || String(course.semester) === semester) ?? [];
+  const semesters = [...new Set(query.data?.courses.map((course) => course.semester))].sort((a, b) => a - b);
+  const back = () => {
+    setFocusId("search");
+    setMode("home");
+  };
+  const backItem: WatchItem = {
+    id: "back", label: "Back", tone: 0,
+    content: <><ArrowLeft aria-hidden="true" /><span>Back</span></>, onClick: back,
+  };
+  const courseContent = (course: NonNullable<typeof selectedCourse>) => (
+    <><CourseIcon course={course} /><span className="watch-course-name">{course.name}</span></>
+  );
+  const items: WatchItem[] = mode === "home" ? [
+    {
+      id: "search", label: "Search", tone: 0,
+      content: <><motion.span className="watch-search-icon" layoutId="search-icon" transition={reduced ? { duration: 0 } : watchTransition} aria-hidden="true"><Search /></motion.span><span>Search</span></>,
+      onClick: () => { setCourseId(undefined); setFocusId(undefined); setMode("search"); },
+    },
+    ...visibleCourses.map((course): WatchItem => ({
+      id: `course-${course.id}`, label: course.name, tone: 2,
+      content: courseContent(course),
+      selected: course.id === courseId,
+      onClick: () => { setCourseId(courseId === course.id ? undefined : course.id); setFocusId(`course-${course.id}`); },
+    })),
+  ] : [backItem];
 
-  const status = isPending ? "checking" : !isError && data?.status === "ok" ? "active" : "inactive";
+  if (mode === "home" && selectedCourse) {
+    const params = new URLSearchParams({ course: selectedCourse.id, semester: String(selectedCourse.semester) });
+    items.push(
+      { id: "responsi", parentId: `course-${selectedCourse.id}`, label: "Materi Responsi", tone: 0, content: <><BookOpen aria-hidden="true" /><span>Responsi</span></>, to: `/responsi?${params}` },
+      { id: "study-club", parentId: `course-${selectedCourse.id}`, label: "Study Club", tone: 0, content: <><Users aria-hidden="true" /><span>Study Club</span></>, to: `/study-clubs?type=Study+Club&${params}` },
+    );
+  }
+
+  const status = mode !== "search" && (
+    query.isPending ? "Loading academic resources…" : query.isError ? (
+      <><span>Resources could not be loaded.</span><button className="button secondary" onClick={() => void query.refetch()}>Try again</button></>
+    ) : mode === "home" && !visibleCourses.length ? (
+      <><h2>No courses available yet</h2><p>{semester ? "Choose another semester." : "Courses will appear when they are published."}</p></>
+    ) : null
+  );
 
   return (
-    <PageLayout>
-      <section className="w-full max-w-3xl rounded-2xl border border-border bg-white p-8 shadow-sm sm:p-12">
-        <h1 className="max-w-xl text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
-          Frontend boilerplate ready for the next feature.
-        </h1>
-        <p className="mt-5 max-w-xl text-base leading-7 text-muted-foreground">
-          The connection check calls the backend health endpoint when this page loads. Refresh it
-          to run the request again, or increment the counter to verify local React state.
-        </p>
-
-        <div className="mt-8 grid gap-4 sm:grid-cols-[1.4fr_1fr]">
-          <div className="rounded-xl border border-border bg-muted p-5">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-              API connection
-            </p>
-            <div className="mt-3 flex items-center gap-3" role="status" aria-live="polite">
-              {status === "checking" && (
-                <>
-                  <LoaderCircle className="h-5 w-5 animate-spin text-muted-foreground" />
-                  <span className="font-semibold text-muted-foreground">Checking backend...</span>
-                </>
-              )}
-              {status === "active" && (
-                <>
-                  <CheckCircle2 className="h-5 w-5 text-green-600" />
-                  <span className="font-semibold text-green-700">Backend active</span>
-                </>
-              )}
-              {status === "inactive" && (
-                <>
-                  <CircleX className="h-5 w-5 text-red-600" />
-                  <span className="font-semibold text-red-700">Backend inactive</span>
-                </>
-              )}
-            </div>
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              A valid response from <code>/api/health</code> marks the service active.
-            </p>
-            <Button
-              className="mt-4 gap-2"
-              variant="outline"
-              onClick={() => void refetch()}
-              disabled={isFetching}
-            >
-              <RefreshCw className={`h-4 w-4 ${isFetching ? "animate-spin" : ""}`} />
-              {isFetching ? "Checking..." : "Refresh connection"}
-            </Button>
+    <MotionConfig reducedMotion="user">
+      <LayoutGroup id="home-watch">
+        <section className="home-launcher" aria-label="Learning home">
+          <div className="launcher-content">
+            <motion.div key={mode} className="launcher-heading" initial={{ opacity: reduced ? 1 : 0, y: reduced ? 0 : 6 }} animate={{ opacity: 1, y: 0 }} transition={reduced ? { duration: 0 } : watchTransition}>
+              <h1>{mode === "home" ? <>Your learning,{" "}<br /><span>all in <span className="launcher-handwritten">one place.</span></span></> : <>What are you{" "}<br /><span>learning today?</span></>}</h1>
+              <p>{mode === "home" ? "Choose your course, then find materials or a Study Club." : "Search courses and materials across all semesters."}</p>
+            </motion.div>
+            {mode === "home" && (
+              <div className="launcher-filters">
+                <label className="select-field">
+                  <span className="sr-only">Filter Home courses by semester</span>
+                  <select value={semester} onChange={(event) => { setCourseId(undefined); setFocusId(undefined); setSemester(event.target.value); }}>
+                    <option value="">All semesters</option>
+                    {semesters.map((value) => <option key={value} value={value}>Semester {value}</option>)}
+                  </select>
+                </label>
+                {!query.isPending && !query.isError && <span role="status">{visibleCourses.length} {visibleCourses.length === 1 ? "course" : "courses"}</span>}
+              </div>
+            )}
+            <WatchField
+              items={items}
+              sceneId={mode === "home" ? `home-${semester}` : "search"}
+              focusId={focusId}
+              status={status}
+              search={mode === "search" ? (
+                <div className="watch-search-panel">
+                  <motion.div className="watch-search-surface" layoutId="search-shape" style={{ borderRadius: 36 }} transition={reduced ? { duration: 0 } : watchTransition} />
+                  <motion.span className="watch-search-icon is-bar-icon" layoutId="search-icon" transition={reduced ? { duration: 0 } : watchTransition} aria-hidden="true"><Search /></motion.span>
+                  <motion.div className="watch-search-content" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: reduced ? 0 : 0.24, delay: 0 } }} transition={{ duration: reduced ? 0 : 0.24, delay: reduced ? 0 : 0.32 }} onAnimationComplete={() => document.querySelector<HTMLInputElement>(".is-search #home-search")?.focus({ preventScroll: true })}>
+                    <HomeSearch />
+                  </motion.div>
+                </div>
+              ) : undefined}
+            />
           </div>
-
-          <div className="flex flex-col justify-between rounded-xl border border-border p-5">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                Local counter
-              </p>
-              <p className="mt-3 text-4xl font-bold tabular-nums text-foreground">{count}</p>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                This value only lives in the frontend.
-              </p>
-            </div>
-            <Button className="mt-4 gap-2" onClick={() => setCount((value) => value + 1)}>
-              <Plus className="h-4 w-4" />
-              Increment counter
-            </Button>
-          </div>
-        </div>
-      </section>
-    </PageLayout>
+        </section>
+      </LayoutGroup>
+    </MotionConfig>
   );
 }

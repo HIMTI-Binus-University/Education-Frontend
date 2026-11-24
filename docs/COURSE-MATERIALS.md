@@ -1,0 +1,10 @@
+# Course-first materials
+
+- Home's Responsi list and the unfiltered `/responsi` directory show one entry per course, linking to its existing `/courses/:courseId` hub. Repeated course IDs are deduplicated in summary order.
+- Course hubs retain individual material titles and Reader links. `/responsi?q=...` still searches material titles; selecting a course filter also displays that course's materials. Home's live material suggestions and direct Reader destinations are unchanged.
+- The Reader outline holds the selected section during native smooth anchor scrolling instead of highlighting intermediate sections. Reaching the destination or `scrollend` releases the hold; wheel, pointer input, and scroll keys resume manual tracking. Existing clamped-bottom anchor handling remains.
+- `public/icon-white.png` is copied byte-for-byte from Internal Frontend's `public/icon-white.svg`. The source has PNG bytes despite its extension; the public favicon uses the correct PNG extension and MIME type. SHA-256: `1A8A5093F70AD76EA5551639A469030DCBA635142EE92896154221A109C69396`.
+
+Verification: 25 component tests cover grouping/deduplication, course-to-material navigation, material search, suggestions, Reader rendering, and scroll highlight locking/interruption. Browser checks exercise course-first navigation, full material search and Home suggestions at 1440/390/320px, inspect every highlight mutation during smooth scrolling to the last section, and check favicon bytes. The existing header/navigation checks cover 1440/768/390/320px and reduced motion. Build and lint also pass.
+
+Design gate: the existing HIMTI palette, typography, spacing, focus treatment, and motion dials are retained. Course grouping clarifies content hierarchy without adding a new visual pattern or navigation destination. The approved white favicon is reused, not generated. Keyboard activation remains native; no new animation or dependency is added, and reduced-motion preferences remain honored. Data remains explicitly demo-only.

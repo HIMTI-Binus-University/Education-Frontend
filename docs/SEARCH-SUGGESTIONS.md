@@ -1,0 +1,14 @@
+# Search suggestions and input pulse
+
+- Main/footer navigation now reads **Schedule**, still pointing to `/study-clubs`; event types remain Study Club and Responsi.
+- Home suggests up to five matching summary titles while typing, with course/exam metadata. It reuses the existing public query/cache and title-only filter, without inventing an API or searching summary bodies. Fixtures remain demo data.
+- Combobox/listbox semantics support Arrow Up/Down, Enter to open the selected Reader, Escape to dismiss, and pointer selection. Input retains focus during keyboard navigation. Clearing or leaving the search closes suggestions. The search button or Enter without a selected suggestion opens the full results page.
+- Loading, unavailable, and no-match feedback are explicit. The dropdown scrolls internally and layers above the scroll invitation, but below navigation.
+- The halo and dots start hidden, then fade in over 650ms while the search field has focus and fade out on blur. Typing adds a subtle 900ms pulse (scale 1 to 1.025) on top of the small breathing motion (scale .99 to 1.02), without changing opacity or scaling the input/results. Fast typing does not restart an in-progress pulse. Reduced motion suppresses movement and fades, including cancellation if the preference changes. No dependency added.
+
+Scoped delivery gate: PASS. Build/lint and 18 tests passed. Real-browser checks at 1440/390/320px exercised recommendation updates, keyboard/click selection, Escape/blur, no matches, full search, and Schedule navigation; confirmed a real halo pseudo-element animation during typing and none under reduced motion. No document overflow or console/page errors. Desktop/mobile captures inspected; the popup remains on an opaque white surface with existing contrast/focus tokens. Existing empty/error resource states and demo labeling preserved.
+
+Follow-up pulse verification: build/lint and browser checks pass at the same three widths. Assertions confirm both halo layers initially have zero opacity, focus reveals the halo, pulse duration/amplitude match the gentler settings, and rapid edits retain the same running animation instead of restarting it. Reduced-motion recommendation behavior remains functional without running animations.
+# Empty-query course recommendations
+
+Focusing or clicking Home search now opens up to five course recommendations even before typing. These use the existing course response order; the demo has no reliable course publication timestamps, so the caption is "Recommended courses", not a fabricated "latest" claim. Typing restores course-name/code and material-title matching; clearing returns to recommendations. Escape dismisses, clicking the still-focused input reopens, and Arrow Up/Down plus Enter work for both modes. Loading/error/empty feedback still comes from the shared query state. No new request or dependency is added.
