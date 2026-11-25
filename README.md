@@ -11,7 +11,7 @@ npm ci
 npm run dev
 ```
 
-Copy `.env.example` to `.env.local` if the API prefix needs changing, then open `http://localhost:3000`. The default is same-origin `/api/public`. Vite exposes `VITE_*` values to the browser; never put secrets there.
+Open `http://localhost:3003`. Vite proxies the default same-origin `/api/public` to the local backend on port `8000`. With `docker compose up --build -d`, the proxy reaches the host backend through `host.docker.internal`. Set `PUBLIC_API_PROXY_TARGET` to override the development proxy when running Vite directly. `VITE_PUBLIC_API_BASE_URL` overrides the browser API prefix; never put secrets in `VITE_*` values.
 
 ```sh
 npm run build

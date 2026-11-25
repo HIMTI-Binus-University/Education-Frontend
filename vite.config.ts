@@ -5,7 +5,13 @@ import path from "node:path";
 export default defineConfig({
   plugins: [react()],
   resolve: { alias: { "@": path.resolve(import.meta.dirname, "./src") } },
-  server: { port: 3003, watch: { ignored: ["**/*.zip"] } },
+  server: {
+    port: 3003,
+    watch: { ignored: ["**/*.zip"] },
+    proxy: {
+      "/api/public": process.env.PUBLIC_API_PROXY_TARGET || "http://localhost:8000",
+    },
+  },
   build: {
     rollupOptions: {
       output: {

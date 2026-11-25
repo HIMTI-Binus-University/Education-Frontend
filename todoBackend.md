@@ -2,10 +2,13 @@
 
 Kontrak aktif: [API-CONTRACT.md](API-CONTRACT.md). Dokumen itu menggantikan seluruh proposal/seed sebelumnya.
 
-- [ ] Implementasikan `GET /api/public/catalog` lengkap tanpa body dokumen dan `GET /api/public/summaries/{id}`.
-- [ ] Sediakan hanya konten yang benar-benar publik, dengan relasi dan schema Tiptap yang valid.
-- [ ] Terapkan status JSON/404, visibility, rate limit, cache invalidation, HTTPS dan CORS sesuai kontrak.
-- [ ] Atur `VITE_PUBLIC_API_BASE_URL` saat build jika tidak memakai prefix same-origin default.
-- [ ] Jalankan uji integrasi frontend terhadap backend asli sebelum go-live.
+- [x] Implementasikan `GET /api/public/catalog` lengkap tanpa body dokumen dan `GET /api/public/summaries/{id}`.
+- [x] Sediakan hanya konten publik: matkul aktif dengan kode dan semester, materi `PUBLISHED`, serta sesi non-demo dengan `isPublic: true`. Jadwal lama tetap privat.
+- [x] Kembalikan JSON dan status sesuai kontrak, gunakan rate limit backend dan `Cache-Control: no-store` untuk API publik.
+- [ ] Konfigurasi HTTPS dan reverse proxy produksi (atau allowlist origin bila lintas origin).
+- [x] Hubungkan development frontend lewat proxy same-origin dan uji kedua endpoint melalui Docker dengan PostgreSQL lokal.
+- [ ] Atur `VITE_PUBLIC_API_BASE_URL` saat build jika produksi tidak memakai prefix same-origin default; ulangi smoke test pada URL deployment.
 
-Frontend tidak lagi memiliki fallback demo. API gagal menampilkan error/retry; katalog kosong menampilkan empty state. Fixture regresi terisolasi di folder test dan tidak masuk bundle produksi. Tidak ada implementasi backend atau Internal dalam pekerjaan ini.
+Frontend tidak punya fallback demo. API gagal menampilkan error/retry; katalog kosong menampilkan empty state. Fixture regresi tidak masuk bundle produksi.
+
+Untuk review lokal, jalankan Compose backend dan frontend. Vite meneruskan `/api/public` ke backend lokal. Isi `semester` matkul lewat API admin Course Groups; kode dan semester tidak ditebak untuk data lama. Untuk membuka jadwal, kirim `isPublic: true` lewat API admin Study Clubs setelah meninjau judul, deskripsi, dan lokasi. Tautan meeting/registrasi tidak dikirim ke publik. Materi tetap disimpan sebagai Markdown dan dikonversi ke Tiptap JSON untuk Reader; PIC internal tidak dipakai sebagai kredit publik.
