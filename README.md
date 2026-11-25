@@ -318,9 +318,8 @@ npm test
 
 ## Using the API Layer
 
-The starter page's `src/api/health/queries.ts` is a working example of calling
-the backend through the shared API client and exposing request state through a
-TanStack Query hook.
+The hooks in `src/api/education/queries.ts` fetch public Education data.
+The client's response contract is documented in `API-CONTRACT.md`.
 
 ### 1. Define Query Keys
 
@@ -458,8 +457,7 @@ export function useCreateArticle() {
 ### 3. Add the Page and Route
 
 Create `src/pages/articles/index.tsx`, consume the hooks there, and register the
-page in `src/config/routes.ts`. Wrap the route with the project's protected
-route mechanism when authentication or permissions are required.
+page in `src/App.tsx`.
 
 ## Tailwind Design System
 
